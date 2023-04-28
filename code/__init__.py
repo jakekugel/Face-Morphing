@@ -8,13 +8,13 @@ import shutil
 import os
 import cv2
 
-def doMorphing(img1, img2, duration, frame_rate, output):
+def doMorphing(img1, img2, duration, frame_rate, output, show_lines):
 
 	[size, img1, img2, points1, points2, list3] = generate_face_correspondences(img1, img2)
 
 	tri = make_delaunay(size[1], size[0], list3, img1, img2)
 
-	generate_morph_sequence(duration, frame_rate, img1, img2, points1, points2, tri, size, output)
+	generate_morph_sequence(duration, frame_rate, img1, img2, points1, points2, tri, size, output, show_lines)
 
 if __name__ == "__main__":
 
@@ -22,12 +22,14 @@ if __name__ == "__main__":
 	parser.add_argument("--img1", required=True, help="The First Image")
 	parser.add_argument("--img2", required=True, help="The Second Image")
 	parser.add_argument("--duration", type=int, default=5, help="The duration")
-	parser.add_argument("--frame", type=int, default=20, help="The frameame Rate")
+	parser.add_argument("--frame", type=int, default=20, help="The frame Rate")
 	parser.add_argument("--output", help="Output Video Path")
+
+	# Added by Jake
+	parser.add_argument("--hide_lines", action=argparse.BooleanOptionalAction, help="Hide the triangulation lines" )
 	args = parser.parse_args()
 
 	image1 = cv2.imread(args.img1)
 	image2 = cv2.imread(args.img2)
 
-	doMorphing(image1, image2, args.duration, args.frame, args.output)
-	
+	doMorphing(image1, image2, args.duration, args.frame, args.output, args.hide_lines)
