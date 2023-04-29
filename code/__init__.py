@@ -7,29 +7,48 @@ import argparse
 import shutil
 import os
 import cv2
+import numpy as np
+import utils.misc
 
-def doMorphing(img1, img2, duration, frame_rate, output, show_lines):
+def doMorphing(images, duration, frame_rate, output, show_lines):
 
-	[size, img1, img2, points1, points2, list3] = generate_face_correspondences(img1, img2)
+	[image_shape, corr_points, transition_average_points] = generate_face_correspondences(images)
 
-	tri = make_delaunay(size[1], size[0], list3, img1, img2)
+	triangulations = make_delaunay(image_shape[1], image_shape[0], transition_average_points, images)
 
-	generate_morph_sequence(duration, frame_rate, img1, img2, points1, points2, tri, size, output, show_lines)
+	generate_morph_sequence(duration, frame_rate, images, corr_points, triangulations, image_shape, output, show_lines)
 
 if __name__ == "__main__":
 
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--img1", required=True, help="The First Image")
-	parser.add_argument("--img2", required=True, help="The Second Image")
+	parser.add_argument("--img1", required=False, help="The First Image")
+	parser.add_argument("--img2", required=False, help="The Second Image")
 	parser.add_argument("--duration", type=int, default=5, help="The duration")
 	parser.add_argument("--frame", type=int, default=20, help="The frame Rate")
 	parser.add_argument("--output", help="Output Video Path")
 
 	# Added by Jake
 	parser.add_argument("--hide_lines", action=argparse.BooleanOptionalAction, help="Hide the triangulation lines" )
+	parser.add_argument("--image_dir", required=False, help="Directory containing images.")
+
 	args = parser.parse_args()
 
-	image1 = cv2.imread(args.img1)
-	image2 = cv2.imread(args.img2)
+	if (args.img1 or args.img2) and args.image_dir:
+		print("Error:  the --image_dir argument cannot be used with the --img1 and --img2 arguments.")
 
-	doMorphing(image1, image2, args.duration, args.frame, args.output, args.hide_lines)
+	# Read in images
+	if args.img1:
+		# Just two images given
+		images = np.zeros((2, image1.shape[0], image1.shape[1], image1.shape[2]), dtype=np.uint8)
+		image[0] = cv2.imread(args.img1)
+		image[1] = cv2.imread(args.img2)
+	else:
+		# Directory containing images given
+		pics = [os.path.join(args.image_dir, file) for file in os.listdir(args.image_dir) if os.path.isfile(os.path.join(args.image_dir, file)) and file.lower().endswith('png')]
+		images = np.zeros((len(pics), 1024, 1024, 3), dtype=np.uint8)
+		for i in range(len(pics)):
+			images[i] = cv2.imread(pics[i])
+
+	print('Loaded {} images'.format(images.shape[0]))
+
+	doMorphing(images, args.duration, args.frame, args.output, args.hide_lines)
