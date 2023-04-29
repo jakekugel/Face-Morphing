@@ -126,11 +126,34 @@ def generate_face_correspondences(images):
                 currList.append((x, y))
                 # cv2.circle(img, (x, y), 2, (0, 255, 0), 2)
 
+        # Add back the background
+        currList.append((1,1))
+        currList.append((size[1]-1,1))
+        currList.append(((size[1]-1)//2,1))
+        currList.append((1,size[0]-1))
+        currList.append((1,(size[0]-1)//2))
+        currList.append(((size[1]-1)//2,size[0]-1))
+        currList.append((size[1]-1,size[0]-1))
+        currList.append(((size[1]-1),(size[0]-1)//2))
+
+        # Check for and fix any correspondence points outside of frame
+        for pt in range(len(currList)):
+            x = currList[pt][0]
+            y = currList[pt][1]
+            if x < 0:
+                x = 0
+            if x > (size[1]-1):
+                x = (size[1]-1)
+            if y < 0:
+                y = 0
+            if y > (size[0]-1):
+                y = (size[0]-1)
+            currList[pt] = (x, y)
+
         # For the second image and above, calculate the average points with the previous image
         if image_num > 0:
-            print('Generating transition between {} and {}.'.format(image_num - 1, image_num))
+            print('Calculating average point positions between frames {} and {}.'.format(image_num - 1, image_num))
             transition_average_points.append(get_average_points(corr_points[image_num - 1], corr_points[image_num]))
-
 
     assert len(corr_points) == images.shape[0]
     assert len(transition_average_points) == images.shape[0] - 1
