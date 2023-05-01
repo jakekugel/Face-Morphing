@@ -67,56 +67,53 @@ def morph_triangle(img1, img2, img, t1, t2, t, alpha) :
         print('    r[3] = {}'.format(r[3]))
 
 
-def generate_morph_sequence(duration, frame_rate, images, points, triangulations, size, output, hide_lines):
-
-    # Number of frames per transition
-    num_frames = int(duration*frame_rate)
-
+def generate_morph_sequence(duration,frame_rate,img1,img2,points1,points2,tri_list,size,output, hide_lines):
+    
+    num_images = int(duration*frame_rate)
     p = Popen(['ffmpeg', '-y', '-f', 'image2pipe', '-r', str(frame_rate),'-s',str(size[1])+'x'+str(size[0]), '-i', '-', '-c:v', 'libx264', '-crf', '25','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2','-pix_fmt','yuv420p', output], stdin=PIPE)
+    
+    for j in range(0, num_images):
 
-    for transition_num in range(len(triangulations)):
-        for j in range(0, num_frames):
+        # Convert Mat to float data type
+        img1 = np.float32(img1)
+        img2 = np.float32(img2)
 
-            # Convert Mat to float data type
-            img1 = np.float32(images[transition_num])
-            img2 = np.float32(images[transition_num + 1])
+        # Read array of corresponding points
+        points = []
+        alpha = j/(num_images-1)
 
-            # Read array of corresponding points
-            interpolated_points = []
-            alpha = j/(num_frames - 1)
+        # Compute weighted average point coordinates
+        for i in range(0, len(points1)):
+            x = (1 - alpha) * points1[i][0] + alpha * points2[i][0]
+            y = (1 - alpha) * points1[i][1] + alpha * points2[i][1]
+            points.append((x,y))
+        
+        # Allocate space for final output
+        morphed_frame = np.zeros(img1.shape, dtype = img1.dtype)
 
-            # Compute weighted average point coordinates
-            for i in range(0, len(points[transition_num])):
-                x = (1 - alpha) * points[transition_num][i][0] + alpha * points[transition_num + 1][i][0]
-                y = (1 - alpha) * points[transition_num][i][1] + alpha * points[transition_num + 1][i][1]
-                interpolated_points.append((x,y))
+        for i in range(len(tri_list)):    
+            x = int(tri_list[i][0])
+            y = int(tri_list[i][1])
+            z = int(tri_list[i][2])
+            
+            t1 = [points1[x], points1[y], points1[z]]
+            t2 = [points2[x], points2[y], points2[z]]
+            t = [points[x], points[y], points[z]]
 
-            # Allocate space for final output
-            morphed_frame = np.zeros(img1.shape, dtype = img1.dtype)
+            # Morph one triangle at a time.
+            morph_triangle(img1, img2, morphed_frame, t1, t2, t, alpha)
+            
+            pt1 = (int(t[0][0]), int(t[0][1]))
+            pt2 = (int(t[1][0]), int(t[1][1]))
+            pt3 = (int(t[2][0]), int(t[2][1]))
 
-            for i in range(len(triangulations[transition_num])):
-                x = int(triangulations[transition_num][i][0])
-                y = int(triangulations[transition_num][i][1])
-                z = int(triangulations[transition_num][i][2])
-
-                t1 = [points[transition_num][x], points[transition_num][y], points[transition_num][z]]
-                t2 = [points[transition_num + 1][x], points[transition_num + 1][y], points[transition_num + 1][z]]
-                t = [interpolated_points[x], interpolated_points[y], interpolated_points[z]]
-
-                # Morph one triangle at a time.
-                morph_triangle(img1, img2, morphed_frame, t1, t2, t, alpha)
-
-                pt1 = (int(t[0][0]), int(t[0][1]))
-                pt2 = (int(t[1][0]), int(t[1][1]))
-                pt3 = (int(t[2][0]), int(t[2][1]))
-
-                if not hide_lines:
-                    cv2.line(morphed_frame, pt1, pt2, (255, 255, 255), 1, 8, 0)
-                    cv2.line(morphed_frame, pt2, pt3, (255, 255, 255), 1, 8, 0)
-                    cv2.line(morphed_frame, pt3, pt1, (255, 255, 255), 1, 8, 0)
-
-            res = Image.fromarray(cv2.cvtColor(np.uint8(morphed_frame), cv2.COLOR_BGR2RGB))
-            res.save(p.stdin,'JPEG')
+            if not hide_lines:
+                cv2.line(morphed_frame, pt1, pt2, (255, 255, 255), 1, 8, 0)
+                cv2.line(morphed_frame, pt2, pt3, (255, 255, 255), 1, 8, 0)
+                cv2.line(morphed_frame, pt3, pt1, (255, 255, 255), 1, 8, 0)
+            
+        res = Image.fromarray(cv2.cvtColor(np.uint8(morphed_frame), cv2.COLOR_BGR2RGB))
+        res.save(p.stdin,'JPEG')
 
     p.stdin.close()
     p.wait()

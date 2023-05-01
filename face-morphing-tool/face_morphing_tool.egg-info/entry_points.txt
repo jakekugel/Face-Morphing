@@ -1,0 +1,3 @@
+[console_scripts]
+face-morphing = app.do_morphing:main
+

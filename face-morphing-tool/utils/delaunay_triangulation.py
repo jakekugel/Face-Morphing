@@ -34,28 +34,25 @@ def draw_delaunay(f_w, f_h, subdiv, dictionary1):
     dictionary1 = {}
     return list4
 
-def make_delaunay(f_w, f_h, transition_average_points, images):
+def make_delaunay(f_w, f_h, theList, img1, img2):
+    
+    # Make a rectangle.
+    rect = (0, 0, f_w, f_h)
 
-    triangulations = []
-    for i in range(len(transition_average_points)):
+    # Create an instance of Subdiv2D.
+    subdiv = cv2.Subdiv2D(rect)
 
-        # Make a rectangle.
-        rect = (0, 0, f_w, f_h)
+    # Make a points list and a searchable dictionary. 
+    theList = theList.tolist()
+    points = [(int(x[0]),int(x[1])) for x in theList]
+    dictionary = {x[0]:x[1] for x in list(zip(points, range(76)))}
+    
+    # Insert points into subdiv
+    for p in points :
+        subdiv.insert(p)
 
-        # Create an instance of Subdiv2D.
-        subdiv = cv2.Subdiv2D(rect)
-
-        # Make a points list and a searchable dictionary.
-        theList = transition_average_points[i]
-        points = [(int(x[0]),int(x[1])) for x in theList]
-        dictionary = {x[0]:x[1] for x in list(zip(points, range(76)))}
-
-        # Insert points into subdiv
-        for p in points :
-            subdiv.insert(p)
-
-        # Make a delaunay triangulation list.
-        triangulations.append(draw_delaunay(f_w, f_h, subdiv, dictionary))
-
-    # Return a list of triangulations, one per image transition.
-    return triangulations
+    # Make a delaunay triangulation list.
+    list4 = draw_delaunay(f_w, f_h, subdiv, dictionary)
+   
+    # Return the list.
+    return list4

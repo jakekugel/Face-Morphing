@@ -82,25 +82,24 @@ def get_average_points(points_list_1, points_list_2):
     return result
 
 
-def generate_face_correspondences(images):
+def generate_face_correspondences(theImage1, theImage2):
     # Detect the points of face.
     detector = dlib.get_frontal_face_detector()
-    predictor = dlib.shape_predictor('code/utils/shape_predictor_68_face_landmarks.dat')
+    predictor = dlib.shape_predictor("face-morphing-tool/utils/shape_predictor_68_face_landmarks.dat")
     corresp = np.zeros((68,2))
 
-    # Assuming all images 1024x1024
-    #imgList = crop_image(theImage1,theImage2)
+    imgList = crop_image(theImage1,theImage2)
+    list1 = []
+    list2 = []
+    j = 1
 
-    corr_points = []
-    transition_average_points = []
-
-    for image_num in range(images.shape[0]):
-        img = images[image_num]
+    for img in imgList:
 
         size = (img.shape[0],img.shape[1])
-
-        currList = []
-        corr_points.append(currList)
+        if(j == 1):
+            currList = list1
+        else:
+            currList = list2
 
         # Ask the detector to find the bounding boxes of each face. The 1 in the
         # second argument indicates that we should upsample the image 1 time. This
@@ -114,48 +113,42 @@ def generate_face_correspondences(images):
         except NoFaceFound:
             print("Sorry, but I couldn't find a face in the image.")
 
-        for k, rect in enumerate(dets):
+        j=j+1
 
+        for k, rect in enumerate(dets):
+            
             # Get the landmarks/parts for the face in rect.
             shape = predictor(img, rect)
             # corresp = face_utils.shape_to_np(shape)
-
-            for i in range(0, 68):
+            
+            for i in range(0,68):
                 x = shape.part(i).x
                 y = shape.part(i).y
                 currList.append((x, y))
+                corresp[i][0] += x
+                corresp[i][1] += y
                 # cv2.circle(img, (x, y), 2, (0, 255, 0), 2)
 
-        # Add back the background
-        currList.append((1,1))
-        currList.append((size[1]-1,1))
-        currList.append(((size[1]-1)//2,1))
-        currList.append((1,size[0]-1))
-        currList.append((1,(size[0]-1)//2))
-        currList.append(((size[1]-1)//2,size[0]-1))
-        currList.append((size[1]-1,size[0]-1))
-        currList.append(((size[1]-1),(size[0]-1)//2))
+            # Add back the background
+            currList.append((1,1))
+            currList.append((size[1]-1,1))
+            currList.append(((size[1]-1)//2,1))
+            currList.append((1,size[0]-1))
+            currList.append((1,(size[0]-1)//2))
+            currList.append(((size[1]-1)//2,size[0]-1))
+            currList.append((size[1]-1,size[0]-1))
+            currList.append(((size[1]-1),(size[0]-1)//2))
 
-        # Check for and fix any correspondence points outside of frame
-        for pt in range(len(currList)):
-            x = currList[pt][0]
-            y = currList[pt][1]
-            if x < 0:
-                x = 0
-            if x > (size[1]-1):
-                x = (size[1]-1)
-            if y < 0:
-                y = 0
-            if y > (size[0]-1):
-                y = (size[0]-1)
-            currList[pt] = (x, y)
+    # Add back the background
+    narray = corresp/2
+    narray = np.append(narray,[[1,1]],axis=0)
+    narray = np.append(narray,[[size[1]-1,1]],axis=0)
+    narray = np.append(narray,[[(size[1]-1)//2,1]],axis=0)
+    narray = np.append(narray,[[1,size[0]-1]],axis=0)
+    narray = np.append(narray,[[1,(size[0]-1)//2]],axis=0)
+    narray = np.append(narray,[[(size[1]-1)//2,size[0]-1]],axis=0)
+    narray = np.append(narray,[[size[1]-1,size[0]-1]],axis=0)
+    narray = np.append(narray,[[(size[1]-1),(size[0]-1)//2]],axis=0)
+    
+    return [size,imgList[0],imgList[1],list1,list2,narray]
 
-        # For the second image and above, calculate the average points with the previous image
-        if image_num > 0:
-            print('Calculating average point positions between frames {} and {}.'.format(image_num - 1, image_num))
-            transition_average_points.append(get_average_points(corr_points[image_num - 1], corr_points[image_num]))
-
-    assert len(corr_points) == images.shape[0]
-    assert len(transition_average_points) == images.shape[0] - 1
-
-    return [size, corr_points, transition_average_points]
