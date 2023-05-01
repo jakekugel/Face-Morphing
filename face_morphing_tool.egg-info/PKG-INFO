@@ -1,12 +1,13 @@
 Metadata-Version: 2.1
 Name: face-morphing-tool
-Version: -function.get-version.at.0x7fe6783935e0-
+Version: -function.get-version.at.0x7f8a8811b790-
 Summary: Final project for UIUC CS445 - Computational photograhy
-Home-page: UNKNOWN
+Home-page: https://github.com/jakekugel/Face-Morphing.git
 Author: Jake Kugel, Shu Xu, Richwell Perez
 License: MIT
 Platform: UNKNOWN
 Requires-Python: >=3.8
+License-File: LICENSE.txt
 
 Face Morphing
 ===================

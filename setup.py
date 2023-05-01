@@ -1,7 +1,6 @@
 from __future__ import annotations
 from setuptools import find_packages, setup
-
-from setup.version import get_version
+from face_morphing_tool.setup.version import get_version
 
 def install_requirements(filename="requirements.txt"):
     try:
@@ -50,13 +49,13 @@ setup(
     description="Final project for UIUC CS445 - Computational photograhy",
     long_description=readme,
     license="MIT",
-    url="",
+    url="https://github.com/jakekugel/Face-Morphing.git",
     version=str(get_version),
     python_requires=">=3.8",
     install_requires=install_requirements(),
     entry_points={
         "console_scripts":[
-            "face-morphing=app.do_morphing:main",
+            "face-morphing=face_morphing_tool.app.do_morphing:main",
         ],
     }
 )

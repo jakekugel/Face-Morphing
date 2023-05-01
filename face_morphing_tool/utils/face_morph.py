@@ -5,7 +5,7 @@ import os
 import math
 from subprocess import Popen, PIPE
 from PIL import Image
-import utils.misc
+from face_morphing_tool.utils import misc
 
 # Apply affine transform calculated using srcTri and dstTri to src and
 # output an image of size.
@@ -58,9 +58,9 @@ def morph_triangle(img1, img2, img, t1, t2, t, alpha) :
         img[r[1]:r[1]+r[3], r[0]:r[0]+r[2]] = img[r[1]:r[1]+r[3], r[0]:r[0]+r[2]] * ( 1 - mask ) + imgRect * mask
     except ValueError as e:
         print('Error: ' + str(e))
-        print('    img: {}'.format(str(utils.misc.array_info(img))))
-        print('    mask: {}'.format(str(utils.misc.array_info(mask))))
-        print('    imgRect: {}'.format(str(utils.misc.array_info(imgRect))))
+        print('    img: {}'.format(str(misc.array_info(img))))
+        print('    mask: {}'.format(str(misc.array_info(mask))))
+        print('    imgRect: {}'.format(str(misc.array_info(imgRect))))
         print('    r[0] = {}'.format(r[0]))
         print('    r[1] = {}'.format(r[1]))
         print('    r[2] = {}'.format(r[2]))

@@ -4,9 +4,9 @@ import sys
 import cv2
 from pathlib import Path
 from argparse import ArgumentParser, Namespace
-from utils.face_landmark_detection import generate_face_correspondences
-from utils.delaunay_triangulation import make_delaunay
-from utils.face_morph import generate_morph_sequence
+from face_morphing_tool.utils.face_landmark_detection import generate_face_correspondences
+from face_morphing_tool.utils.delaunay_triangulation import make_delaunay
+from face_morphing_tool.utils.face_morph import generate_morph_sequence
 
 
 def face_morphing(image1, image2, output, hide_lines=True, duration=5, frame_rate=20):
@@ -88,10 +88,9 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
-    # Need to step output of the face-morphing-tool directory in order to use it
-	# image1 = 'face-morphing-tool/images/Shu/1.png'
-	# image2 = 'face-morphing-tool/images/Shu/2.png'
-	# output_path = 'face-morphing-tool/results/output2.mp4'
-
-	#face_morphing(image1, image2,output_path)
+    #sys.exit(main())
+    #Need to step output of the face-morphing-tool directory in order to use it
+	image1 = 'images/Shu/1.png'
+	image2 = 'images/Shu/2.png'
+	output_path = 'results/output2.mp4'
+	face_morphing(image1, image2,output_path)
