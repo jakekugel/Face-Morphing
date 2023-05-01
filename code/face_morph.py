@@ -77,10 +77,6 @@ def get_b_splines(points):
         y_vals = np.array([points[i][corr_point_num][1] for i in range(len(points))], dtype=np.float32)
         t_vals = np.array([float(i) for i in range(len(points))], dtype=np.float32)
 
-        print('x_vals shape: {}'.format(str(x_vals.shape)))
-        print('x_vals type: {}'.format(str(x_vals.dtype)))
-        print('x_vals: {}'.format(str(x_vals)))
-
         tx, cx, kx = interpolate.splrep(t_vals, x_vals, s=0, k=4)
         b_spline_x = interpolate.BSpline(tx, cx, kx, extrapolate=False)
 
@@ -109,7 +105,7 @@ def interpolate_points(points, b_splines, transition_num, j, num_frames):
     return interpolated_points
 
 
-def generate_morph_sequence(duration, frame_rate, images, points, triangulations, size, output, hide_lines):
+def generate_morph_sequence(duration, frame_rate, images, points, triangulations, size, output, hide_lines, b_spline):
 
     # Number of frames per transition
     num_frames = int(duration*frame_rate)
@@ -125,15 +121,19 @@ def generate_morph_sequence(duration, frame_rate, images, points, triangulations
             img1 = np.float32(images[transition_num])
             img2 = np.float32(images[transition_num + 1])
 
-            # Get interpolated correspondence points
             alpha = j/(num_frames - 1)
-            interpolated_points = interpolate_points(points, b_splines, transition_num, j, num_frames)
 
-            # interpolated_points = []
-            # for i in range(0, len(points[transition_num])):
-            #     x = (1 - alpha) * points[transition_num][i][0] + alpha * points[transition_num + 1][i][0]
-            #     y = (1 - alpha) * points[transition_num][i][1] + alpha * points[transition_num + 1][i][1]
-            #     interpolated_points.append((x,y))
+            # Interpolate correspondence points.
+            if b_spline:
+                # Use a b-spline to interpolate positions of correspondence points.
+                interpolated_points = interpolate_points(points, b_splines, transition_num, j, num_frames)
+            else:
+                # Use standard linear interpolation for positions of correspondence points.
+                interpolated_points = []
+                for i in range(0, len(points[transition_num])):
+                    x = (1 - alpha) * points[transition_num][i][0] + alpha * points[transition_num + 1][i][0]
+                    y = (1 - alpha) * points[transition_num][i][1] + alpha * points[transition_num + 1][i][1]
+                    interpolated_points.append((x,y))
 
 
             # Allocate space for final output
