@@ -85,7 +85,7 @@ def get_average_points(points_list_1, points_list_2):
 def generate_face_correspondences(images):
     # Detect the points of face.
     detector = dlib.get_frontal_face_detector()
-    predictor = dlib.shape_predictor('code/utils/shape_predictor_68_face_landmarks.dat')
+    predictor = dlib.shape_predictor("face_morphing_tool/utils/shape_predictor_68_face_landmarks.dat")
     corresp = np.zeros((68,2))
 
     # Assuming all images 1024x1024
