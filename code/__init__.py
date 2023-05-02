@@ -10,13 +10,13 @@ import cv2
 import numpy as np
 import utils.misc
 
-def doMorphing(images, duration, frame_rate, output, show_lines):
+def doMorphing(images, duration, frame_rate, output, show_lines, b_spline):
 
 	[image_shape, corr_points, transition_average_points] = generate_face_correspondences(images)
 
 	triangulations = make_delaunay(image_shape[1], image_shape[0], transition_average_points, images)
 
-	generate_morph_sequence(duration, frame_rate, images, corr_points, triangulations, image_shape, output, show_lines)
+	generate_morph_sequence(duration, frame_rate, images, corr_points, triangulations, image_shape, output, show_lines, b_spline)
 
 if __name__ == "__main__":
 
@@ -30,6 +30,7 @@ if __name__ == "__main__":
 	# Added by Jake
 	parser.add_argument("--hide_lines", action=argparse.BooleanOptionalAction, help="Hide the triangulation lines" )
 	parser.add_argument("--image_dir", required=False, help="Directory containing images.")
+	parser.add_argument("--b_spline", action=argparse.BooleanOptionalAction, help="If provided, a b-spline is used to interpolate the position of the correspondence points.")
 
 	args = parser.parse_args()
 
@@ -51,4 +52,4 @@ if __name__ == "__main__":
 
 	print('Loaded {} images'.format(images.shape[0]))
 
-	doMorphing(images, args.duration, args.frame, args.output, args.hide_lines)
+	doMorphing(images, args.duration, args.frame, args.output, args.hide_lines, args.b_spline)
