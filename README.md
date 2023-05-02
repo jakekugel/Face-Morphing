@@ -58,6 +58,9 @@ More Results
 
 ![Morphed Video](results/ld-final.gif)
 
+```
+python code/__init__.py --image_dir images/richwell --output output.mp4 --hide_lines
+```
 
 To Do
 -------------
