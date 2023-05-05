@@ -1,70 +1,41 @@
 Face Morphing
 ===================
 
-Create a morphing sequences betwen two faces. 
+This is a tool to build a face morph video between multiple face images.  This project began as a clone of the
+open source project [Face-Morphing](https://github.com/Azmarie/Face-Morphing).
 
-Input: Two images containing faces  
-Output: A video showing the fluid transformation from one face to the other  
+Input: A directory containing images of faces.
+Output: A video showing the fluid transformation from one face to the other.
 
-Requirements
+Installation
 -------------
-```
-numpy
-scikit_image
-opencv_python
-Pillow
-skimage
-dlib
-```
+1.  Install Python from [here](https://www.python.org/).
 
-Getting Started
+2.  Install CMake from [here](https://cmake.org/download/).
+
+3.  Install ffmpeg from [here](https://ffmpeg.org/download.html).
+
+4.  Install the tool in develop mode:
+
+    `python setup.py develop`
+
+Usage
 -------------
 
-#### Test with demo images
+#### Creating a face morph with a directory containing images.
 
-A photo of Jennie from Blackpink       |  A photo of Rihanna
-:-------------------------:|:-------------------------:
-![](/images/aligned_images/jennie.png)  |  ![](/images/aligned_images/rih.png)
-
-
-Generate a morphing animation video sequence
-
-```
-python3 code/__init__.py --img1 images/aligned_images/jennie.png --img2 images/aligned_images/rih.png --output output.mp4
-```
-
-![Morphed Video](results/output.gif)
-
-#### Test with your own images
-
-1. Put your images in `Images` folder
-
-2. Auto align faces with `python code/utils/align_images.py images/ images/aligned_images --output_size=1024`
-This will look for faces in the images - crop out, align (center the nose and make the eyes horizontal), and then rescale the resulting images and save them in "aligned_images" folder.
-3. Run `code/__init__.py` above on your aligned face images with arg `--img1` and `--img2`.
-
-
+face-morphing --image_dir images/jake --output output.mp4 --b_spline --duration 2 --hide_lines
 
 Key Features
 -------------
-1. Detect and **auto align faces** in images (Optional for face morphing) 
+1. Detect and **auto align faces** in images (Optional for face morphing)
 2. Generate **corresponding features points** between the two images using Dlib's Facial Landmark Detection
 3. Calculate the **triangular mesh** with Delaunay Triangulation for each intermediate shape
 4. Warp the two input images towards the intermediate shape, perform **cross-dissolve** and obtain intermediate images each frame
-
-More Results
--------------
-![Morphed Video](results/final-club-final.gif)
-
-![Morphed Video](results/ld-final.gif)
-
-
-To Do
--------------
-Morph multiple images into a complete sequence  
-Morph with body landmarks
+5. Packaged into a user-friendly command-line interface.
+6. Optionally use B-spline interpolation for calculation of correspondence point positions for warp.
 
 Citations
 -------------
 
-Adivces on working with facial landmarks with dlib and opencv https://www.pyimagesearch.com/2017/04/03/facial-landmarks-dlib-opencv-python/ 
+Adivces on working with facial landmarks with dlib and opencv https://www.pyimagesearch.com/2017/04/03/facial-landmarks-dlib-opencv-python/
