@@ -121,8 +121,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-    #Need to step output of the face-morphing-tool directory in order to use it
-	# image1 = 'images/Shu/1.png'
-	# image2 = 'images/Shu/2.png'
-	# output_path = 'results/output2.mp4'
-	# face_morphing(image1, image2,output_path)

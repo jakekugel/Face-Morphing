@@ -17,7 +17,7 @@ Installation
 
 4.  Install the tool in develop mode:
 
-    `python setup.py develop`
+    `python setup.py install`
 
 Key Features
 -------------
