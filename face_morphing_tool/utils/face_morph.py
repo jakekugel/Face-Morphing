@@ -5,7 +5,8 @@ import os
 import math
 from subprocess import Popen, PIPE
 from PIL import Image
-import utils.misc
+from face_morphing_tool.utils import misc
+import scipy.interpolate as interpolate
 
 # Apply affine transform calculated using srcTri and dstTri to src and
 # output an image of size.
@@ -58,19 +59,82 @@ def morph_triangle(img1, img2, img, t1, t2, t, alpha) :
         img[r[1]:r[1]+r[3], r[0]:r[0]+r[2]] = img[r[1]:r[1]+r[3], r[0]:r[0]+r[2]] * ( 1 - mask ) + imgRect * mask
     except ValueError as e:
         print('Error: ' + str(e))
-        print('    img: {}'.format(str(utils.misc.array_info(img))))
-        print('    mask: {}'.format(str(utils.misc.array_info(mask))))
-        print('    imgRect: {}'.format(str(utils.misc.array_info(imgRect))))
+        print('    img: {}'.format(str(misc.array_info(img))))
+        print('    mask: {}'.format(str(misc.array_info(mask))))
+        print('    imgRect: {}'.format(str(misc.array_info(imgRect))))
         print('    r[0] = {}'.format(r[0]))
         print('    r[1] = {}'.format(r[1]))
         print('    r[2] = {}'.format(r[2]))
         print('    r[3] = {}'.format(r[3]))
 
 
-def generate_morph_sequence(duration, frame_rate, images, points, triangulations, size, output, hide_lines):
+def get_b_splines(points):
+    '''
+    Returns a list containing tuples, where each tuple has two elements, a function
+    the returns x coordinates given a time parameter, and a function that returns y
+    coordinates given a time parameter.
+
+    Parameters:
+        points - a list[u][v] of tuples containing x,y coordinates.  The u index
+           is the image number, and the v index is the correspondence point number.
+    '''
+
+    b_splines = []
+
+    for corr_point_num in range(len(points[0])):
+        x_vals = np.array([points[i][corr_point_num][0] for i in range(len(points))], dtype=np.float32)
+        y_vals = np.array([points[i][corr_point_num][1] for i in range(len(points))], dtype=np.float32)
+        t_vals = np.array([float(i) for i in range(len(points))], dtype=np.float32)
+
+        tx, cx, kx = interpolate.splrep(t_vals, x_vals, s=0, k=4)
+        b_spline_x = interpolate.BSpline(tx, cx, kx, extrapolate=False)
+
+        ty, cy, ky = interpolate.splrep(t_vals, y_vals, s=0, k=4)
+        b_spline_y = interpolate.BSpline(ty, cy, ky, extrapolate=False)
+
+        b_splines.append([b_spline_x, b_spline_y])
+
+    return b_splines
+
+
+def interpolate_points(num_points, b_splines, transition_num, alpha):
+    '''
+    Returns a list of tuples containing the interpolated correspondence points.
+
+    arguments:
+       num_points - the number of correspondence points
+       b_splines - list of tuples, each tuple has two elements - a function that returns
+           an x coordinate given a time parameter, and a function that returns a
+           y coordinate given a time parameter.
+       transition_num - an integer indicating which transition in the sequence.  0 =
+           the transition between images 1 and 2, 1 = the transition between 2 and 3, etc.
+       alpha - a float value from 0 to 1 indicating weight given to the second image in the
+           transition.
+    '''
+
+    interpolated_points = []
+
+    for corr_point_num in range(0, num_points):
+        t = float(transition_num) + alpha
+
+        spline_x = b_splines[corr_point_num][0]
+        spline_y = b_splines[corr_point_num][1]
+
+        x = spline_x(t)
+        y = spline_y(t)
+
+        interpolated_points.append( (x, y) )
+
+    return interpolated_points
+
+
+def generate_morph_sequence(duration, frame_rate, images, points, triangulations, size, output, hide_lines, b_spline, bounce):
 
     # Number of frames per transition
     num_frames = int(duration*frame_rate)
+
+    if b_spline:
+        b_splines = get_b_splines(points)
 
     p = Popen(['ffmpeg', '-y', '-f', 'image2pipe', '-r', str(frame_rate),'-s',str(size[1])+'x'+str(size[0]), '-i', '-', '-c:v', 'libx264', '-crf', '25','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2','-pix_fmt','yuv420p', output], stdin=PIPE)
 
@@ -81,15 +145,23 @@ def generate_morph_sequence(duration, frame_rate, images, points, triangulations
             img1 = np.float32(images[transition_num])
             img2 = np.float32(images[transition_num + 1])
 
-            # Read array of corresponding points
-            interpolated_points = []
             alpha = j/(num_frames - 1)
 
-            # Compute weighted average point coordinates
-            for i in range(0, len(points[transition_num])):
-                x = (1 - alpha) * points[transition_num][i][0] + alpha * points[transition_num + 1][i][0]
-                y = (1 - alpha) * points[transition_num][i][1] + alpha * points[transition_num + 1][i][1]
-                interpolated_points.append((x,y))
+            if bounce:
+                alpha = 1.0 - abs(math.cos(100 * alpha / (40 * (1.0 - 0.9*(alpha))))) * ( (1 - alpha) ** 1.2)
+
+            # Interpolate correspondence points.
+            if b_spline:
+                # Use a b-spline to interpolate positions of correspondence points.
+                interpolated_points = interpolate_points(len(points[0]), b_splines, transition_num, alpha)
+            else:
+                # Use standard linear interpolation for positions of correspondence points.
+                interpolated_points = []
+                for i in range(0, len(points[transition_num])):
+                    x = (1 - alpha) * points[transition_num][i][0] + alpha * points[transition_num + 1][i][0]
+                    y = (1 - alpha) * points[transition_num][i][1] + alpha * points[transition_num + 1][i][1]
+                    interpolated_points.append((x,y))
+
 
             # Allocate space for final output
             morphed_frame = np.zeros(img1.shape, dtype = img1.dtype)
