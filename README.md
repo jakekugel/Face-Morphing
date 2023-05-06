@@ -23,10 +23,10 @@ Key Features
 -------------
 The following features were part of the origin [Face-Morphing](https://github.com/Azmarie/Face-Morphing) project that this app was based on.
 
-1. Detect and **auto align faces** in images (Optional for face morphing)
-2. Generate **corresponding features points** between the two images using Dlib's Facial Landmark Detection
-3. Calculate the **triangular mesh** with Delaunay Triangulation for each intermediate shape
-4. Warp the two input images towards the intermediate shape, perform **cross-dissolve** and obtain intermediate images each frame
+1. Optionally detect and auto-align faces in the images.
+2. Use the dlib open-source tool to identify the facial landmarks used as correspondence points.
+3. Use Delaunay triangulation to construct the triangular mesh for the correspondence points.
+4. Interpolate the positions of the correspondence points between two images, warp the images, and use cross-dissolve to construct each intermediate frame.
 
 The following features are new additions that were added for the class project.
 
