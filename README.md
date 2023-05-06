@@ -32,13 +32,13 @@ Key Features
 Example Usage
 -------------
 #### Create a standard face morph between two specific images, and save results as 'output.mp4'
-face-morphing --image1 images/aligned_images/jennie.png --image2 images/aligned_images/rih.png --output output.mp4 --hide_lines
+`face-morphing --image1 images/aligned_images/jennie.png --image2 images/aligned_images/rih.png --output output.mp4 --hide_lines`
 
 #### Create a face morph with a directory containing multiple images.
-face-morphing --image_dir images/jake --output output.mp4 --duration 2 --hide_lines
+`face-morphing --image_dir images/jake --output output.mp4 --duration 2 --hide_lines`
 
 #### Create a face morph that utilizes B-spline interpolation of correspondence points.
-face-morphing --image_dir images/jake --output output.mp4 --b_spline --duration 2 --hide_lines
+`face-morphing --image_dir images/jake --output output.mp4 --b_spline --duration 2 --hide_lines`
 
 Parameter Help
 --------------
