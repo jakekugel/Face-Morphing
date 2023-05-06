@@ -4,8 +4,8 @@ Face Morphing
 This is a tool to build a face morph video between multiple face images.  This project began as a clone of the
 open source project [Face-Morphing](https://github.com/Azmarie/Face-Morphing).
 
-Input: A directory containing images of faces.
-Output: A video showing the fluid transformation from one face to the other.
+* Input: A directory containing images of faces.
+* Output: A video showing the fluid transformation from one face to the other.
 
 Installation
 -------------
@@ -25,9 +25,10 @@ Key Features
 2. Generate **corresponding features points** between the two images using Dlib's Facial Landmark Detection
 3. Calculate the **triangular mesh** with Delaunay Triangulation for each intermediate shape
 4. Warp the two input images towards the intermediate shape, perform **cross-dissolve** and obtain intermediate images each frame
-5. Packaged into a user-friendly command-line interface.
-6. Optionally use B-spline interpolation for calculation of correspondence point positions for warp.
-7. Optionally add a bounce effect in the transition between each image pair.
+5. Packaged into a user-friendly command-line app.
+6. Added an option to read all images in a directory and create a face morph video with mutiple images.
+7. Added an option for B-spline interpolation for calculation of correspondence point positions for warp.
+8. Added an option to create a bounce effect in the transition between each image pair.
 
 Example Usage
 -------------
@@ -86,6 +87,9 @@ References and Resources
 ------------------------
 [1] Wang, Azmarie.  "Face Morphing–A Step-by-Step Tutorial with Code".  Medium.com.  https://azmariewang.medium.com/face-morphing-a-step-by-step-tutorial-with-code-75a663cdc666  (accessed 2/1/2023).
 
-[2] Adams, Peter.  "Faces of Open Source".  https://www.facesofopensource.com/ (accessed 2/1/2023).
+[2] Wang, Azmarie.  https://github.com/Azmarie/Face-Morphing. (accessed 2/1/2023).
 
-[3] The SciPy community. "scipy.interpolate.BSpline".  https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.BSpline.html (accessed 2/1/2023)/
+[3] Adams, Peter.  "Faces of Open Source".  https://www.facesofopensource.com/ (accessed 2/1/2023).
+
+[4] The SciPy community. "scipy.interpolate.BSpline".  https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.BSpline.html (accessed 2/1/2023)/
+
