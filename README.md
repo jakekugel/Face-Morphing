@@ -19,13 +19,6 @@ Installation
 
     `python setup.py develop`
 
-Usage
--------------
-
-#### Creating a face morph with a directory containing images.
-
-face-morphing --image_dir images/jake --output output.mp4 --b_spline --duration 2 --hide_lines
-
 Key Features
 -------------
 1. Detect and **auto align faces** in images (Optional for face morphing)
@@ -34,8 +27,59 @@ Key Features
 4. Warp the two input images towards the intermediate shape, perform **cross-dissolve** and obtain intermediate images each frame
 5. Packaged into a user-friendly command-line interface.
 6. Optionally use B-spline interpolation for calculation of correspondence point positions for warp.
+7. Optionally add a bounce effect in the transition between each image pair.
 
-Citations
+Example Usage
 -------------
+#### Create a standard face morph between two specific images, and save results as 'output.mp4'
+face-morphing --image1 images/aligned_images/jennie.png --image2 images/aligned_images/rih.png --output output.mp4 --hide_lines
 
-Adivces on working with facial landmarks with dlib and opencv https://www.pyimagesearch.com/2017/04/03/facial-landmarks-dlib-opencv-python/
+#### Create a face morph with a directory containing multiple images.
+face-morphing --image_dir images/jake --output output.mp4 --duration 2 --hide_lines
+
+#### Create a face morph that utilizes B-spline interpolation of correspondence points.
+face-morphing --image_dir images/jake --output output.mp4 --b_spline --duration 2 --hide_lines
+
+Parameter Help
+--------------
+**--image1 <filename>**
+
+The first image to use in the face morph.  If the --image1 parameter is used, the --image2 parameter is also required.
+
+**--image2 <filename>**
+
+The second image to use in the face morph.  If the --image2 parameter is used, the --image1 parameter is also required.
+
+**--image_dir <directory name>**
+
+The directory containing images to use in a face morph.  All images in the directory are used.  This is an alternative to
+--image1 and --image2.
+
+**--output <filename>**
+
+The file name of the generated face morph video.
+
+**--duration**
+
+Optional, the number of seconds for each transition.  Default is 5.
+
+**--b_spline**
+
+Optional, if provided a B-spline interpolation is used to calculate the position of the correspondence points.
+
+**--hide_lines**
+
+Optional, if provided, the triangulation lines are not shown.
+
+**--bounce**
+
+Optional, if provided, a bouncing effect is applied to each transition.
+
+
+References and Resources
+------------------------
+[1] Wang, Azmarie.  "Face Morphing–A Step-by-Step Tutorial with Code".  Medium.com.  https://azmariewang.medium.com/face-morphing-a-step-by-step-tutorial-with-code-75a663cdc666  (accessed 2/1/2023).
+
+[2] Adams, Peter.  "Faces of Open Source".  https://www.facesofopensource.com/ (accessed 2/1/2023).
+
+[3] The SciPy community. "scipy.interpolate.BSpline".  https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.BSpline.html (accessed 2/1/2023)/
