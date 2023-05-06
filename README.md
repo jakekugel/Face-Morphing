@@ -78,6 +78,9 @@ Optional, if provided, the triangulation lines are not shown.
 
 Optional, if provided, a bouncing effect is applied to each transition.
 
+```
+python code/__init__.py --image_dir images/richwell --output output.mp4 --hide_lines
+```
 
 References and Resources
 ------------------------
