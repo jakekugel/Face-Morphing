@@ -21,14 +21,19 @@ Installation
 
 Key Features
 -------------
+The following features were part of the origin [Face-Morphing](https://github.com/Azmarie/Face-Morphing) project that this app was based on.
+
 1. Detect and **auto align faces** in images (Optional for face morphing)
 2. Generate **corresponding features points** between the two images using Dlib's Facial Landmark Detection
 3. Calculate the **triangular mesh** with Delaunay Triangulation for each intermediate shape
 4. Warp the two input images towards the intermediate shape, perform **cross-dissolve** and obtain intermediate images each frame
-5. Packaged into a user-friendly command-line app.
-6. Added an option to read all images in a directory and create a face morph video with mutiple images.
-7. Added an option for B-spline interpolation for calculation of correspondence point positions for warp.
-8. Added an option to create a bounce effect in the transition between each image pair.
+
+The following features are new additions that were added for the class project.
+
+1. Packaged into a user-friendly command-line app.
+2. Added an option to read all images in a directory and create a face morph video with mutiple images.
+3. Added an option for B-spline interpolation for calculation of correspondence point positions for warp.
+4. Added an option to create a bounce effect in the transition between each image pair.
 
 Example Usage
 -------------
