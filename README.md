@@ -15,7 +15,7 @@ Installation
 
 3.  Install ffmpeg from [here](https://ffmpeg.org/download.html).
 
-4.  Install the tool in develop mode:
+4.  Install the tool:
 
     `python setup.py install`
 
@@ -39,6 +39,9 @@ Example Usage
 
 #### Create a face morph that utilizes B-spline interpolation of correspondence points.
 `face-morphing --image_dir images/jake --output output.mp4 --b_spline --duration 2 --hide_lines`
+
+#### Create a face morph that adds a bounce effect in the transition between images.ints.
+`face-morphing --image_dir images/jake --output output.mp4 --bounce --duration 2 --hide_lines`
 
 Parameter Help
 --------------
