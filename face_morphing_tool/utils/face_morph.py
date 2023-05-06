@@ -69,6 +69,16 @@ def morph_triangle(img1, img2, img, t1, t2, t, alpha) :
 
 
 def get_b_splines(points):
+    '''
+    Returns a list containing tuples, where each tuple has two elements, a function
+    the returns x coordinates given a time parameter, and a function that returns y
+    coordinates given a time parameter.
+
+    Parameters:
+        points - a list[u][v] of tuples containing x,y coordinates.  The u index
+           is the image number, and the v index is the correspondence point number.
+    '''
+
     b_splines = []
 
     for corr_point_num in range(len(points[0])):
@@ -87,11 +97,25 @@ def get_b_splines(points):
     return b_splines
 
 
-def interpolate_points(points, b_splines, transition_num, j, num_frames):
+def interpolate_points(num_points, b_splines, transition_num, alpha):
+    '''
+    Returns a list of tuples containing the interpolated correspondence points.
+
+    arguments:
+       num_points - the number of correspondence points
+       b_splines - list of tuples, each tuple has two elements - a function that returns
+           an x coordinate given a time parameter, and a function that returns a
+           y coordinate given a time parameter.
+       transition_num - an integer indicating which transition in the sequence.  0 =
+           the transition between images 1 and 2, 1 = the transition between 2 and 3, etc.
+       alpha - a float value from 0 to 1 indicating weight given to the second image in the
+           transition.
+    '''
+
     interpolated_points = []
 
-    for corr_point_num in range(0, len(points[0])):
-        t = float(transition_num) + j / num_frames
+    for corr_point_num in range(0, num_points):
+        t = float(transition_num) + alpha
 
         spline_x = b_splines[corr_point_num][0]
         spline_y = b_splines[corr_point_num][1]
@@ -104,7 +128,7 @@ def interpolate_points(points, b_splines, transition_num, j, num_frames):
     return interpolated_points
 
 
-def generate_morph_sequence(duration, frame_rate, images, points, triangulations, size, output, hide_lines, b_spline):
+def generate_morph_sequence(duration, frame_rate, images, points, triangulations, size, output, hide_lines, b_spline, bounce):
 
     # Number of frames per transition
     num_frames = int(duration*frame_rate)
@@ -123,10 +147,13 @@ def generate_morph_sequence(duration, frame_rate, images, points, triangulations
 
             alpha = j/(num_frames - 1)
 
+            if bounce:
+                alpha = 1.0 - abs(math.cos(100 * alpha / (40 * (1.0 - 0.9*(alpha))))) * ( (1 - alpha) ** 1.2)
+
             # Interpolate correspondence points.
             if b_spline:
                 # Use a b-spline to interpolate positions of correspondence points.
-                interpolated_points = interpolate_points(points, b_splines, transition_num, j, num_frames)
+                interpolated_points = interpolate_points(len(points[0]), b_splines, transition_num, alpha)
             else:
                 # Use standard linear interpolation for positions of correspondence points.
                 interpolated_points = []

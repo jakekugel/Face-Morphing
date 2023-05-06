@@ -12,7 +12,7 @@ from face_morphing_tool.utils.delaunay_triangulation import make_delaunay
 from face_morphing_tool.utils.face_morph import generate_morph_sequence
 
 
-def face_morphing(image1, image2, image_dir, output, hide_lines, b_spline, duration=5, frame_rate=20):
+def face_morphing(image1, image2, image_dir, output, hide_lines, b_spline, bounce, duration=5, frame_rate=20):
 
 	"""
 	Entry point for the process
@@ -57,7 +57,7 @@ def face_morphing(image1, image2, image_dir, output, hide_lines, b_spline, durat
 
 		triangulations = make_delaunay(image_shape[1], image_shape[0], transition_average_points, images)
 
-		generate_morph_sequence(duration, frame_rate, images, corr_points, triangulations, image_shape, output, hide_lines, b_spline)
+		generate_morph_sequence(duration, frame_rate, images, corr_points, triangulations, image_shape, output, hide_lines, b_spline, bounce)
 
 		return 0
 	except Exception as e:
@@ -97,7 +97,8 @@ def main():
 		"--duration <duration of the generated video in seconds> "
 		"--frame_rate <fame rate of the generated video in fps> "
 		"--image_dir <directory containing images for face morph> "
-		"--b_spline <use b-spline interpolation>"
+		"--b_spline <use b-spline interpolation> "
+		"--bounce <add a bounce effect in each image transition>"
 		,
 		description="Do face-morphing based on two face images",
 	)
@@ -110,6 +111,7 @@ def main():
 	parser.add_argument("--hide_lines", action=BooleanOptionalAction, help="Hide the triangulation lines" )
 	parser.add_argument("--image_dir", required=False, help="Directory containing images.")
 	parser.add_argument("--b_spline", action=BooleanOptionalAction, help="If provided, a b-spline is used to interpolate the position of the correspondence points.")
+	parser.add_argument("--bounce", action=BooleanOptionalAction, help="If provided, a bouncing effect is applied in each transition.")
 
 	args = parser.parse_args()
 	print(args)
